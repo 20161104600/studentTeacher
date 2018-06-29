@@ -45,6 +45,41 @@ typedef struct
     int lastT;
 }SeqListT;
 
+int load(SeqListT *L)//写入读取
+{
+    FILE * fp;
+    fp=fopen("Users/a20161104600/Desktop/Student/student\&teacher/student\&teacher/student.csv ","r+");
+    if(fp==NULL)
+    {
+        printf("没有这个文件！\n");
+        return 0;
+    }
+    else if(fp!=NULL)
+    {
+        int i,j;
+        char name[10];
+        int num,MScore,CScore,EScore,Score;
+        //fscanf(fp,"|  –Ú∫≈  |  –’√˚  |   —ß∫≈   |   ˝—ß  |  ”ÔŒƒ  |  ”¢”Ô  | ◊‹≥…º® |\n");
+        //fscanf(fp,"|--------|--------|----------|--------|--------|--------|--------|\n");
+        //ElemType X;
+        while(fscanf(fp,"%d,%s,%d,%d,%d,%d,%d\n",&j,name,&num,&MScore,&CScore,&EScore,&Score)!=EOF)
+        {
+            i=j-1;
+            strcpy(L->elem[i].name,name);
+            L->elem[i].num=num;
+            L->elem[i].MathScore=MScore;
+            L->elem[i].ChinaseScore=CScore;
+            L->elem[i].EnglishScore=EScore;
+            L->elem[i].Score=Score;
+            //printf("|%-8d|%-8s|%-10d|%-8d|%-8d|%-8d|%-8d|\n",i+1,L->elem[i].name,L->elem[i].num,L->elem[i].MathScore,L->elem[i].ChinaseScore,L->elem[i].EnglishScore,L->elem[i].Score);
+            L->last++;
+        } 
+        printf("        Œƒº˛∂¡»°≥…π¶\n\n");
+        fclose(fp);	
+    }
+    return 0;
+}
+
 char menu()
 {
     int input;
@@ -252,30 +287,38 @@ void find(SeqListT L1,SeqListS L2)
     }
 }
 
-void grade(SeqListT L1,SeqListS L2)//评分
+void grade(SeqListT *L1,SeqListS *L2)//评分
 {
-    int s=0,t=0,j=1,a;
-    a=L1.lastT;
+    int s=0,t=0,i,j=1,a;
+    a=L1->lastT;
     printf("开始评分\n");
-    for(s=0;s<=L2.lastS;s++)
+    for(s=0;s<=L2->lastS;s++)
     {
         printf("----------------------------\n");
-        printf("%d\n",s+1);
-        while(j)
+        printf("对第%d名同学评分：\n",s+1);
+        for(t=0;t<=L1->lastT;t++)
         {
-            for(t=0;t<=L1.lastT;t++)
-            {
-                printf("请输入%s老师给予的分数：",L1.elem[t].name);
-                scanf("%d",&L1.elem[t].Score);
-                printf("\n");
-            }
-            count(L1);
-            printf("去除一个最高分：%d\n",L1.elem[0].Score);
-            printf("去除一个最低分：%d\n",L1.elem[a].Score);
-            printf("最后%s同学得分：%d\n",L2.elem[s].name,count(L1));
+            printf("请输入%s老师给予的分数：",L1->elem[t].name);
+            scanf("%d",&L1->elem[t].Score);
+            printf("\n");
         }
+        printf("已经对第%d名同学完成评分，是否保存（保存后不可更改）！（1.保存   2.修改信息）：\n",s+1);
+        scanf("%d",&j);
+        while(j==2)
+        {
+            //readin(&L1);
+            printf("请输入要修改第几名教师所给的分数：\n");
+            scanf("%d",&i);
+            printf("请输入分数：\n");
+            scanf("%d",&L1->elem[i-1].Score);
+            printf("是否继续修改其他老师给的分数：\n");
+            scanf("%d",&j);
+        }
+        count(*L1);
+        printf("去除一个最高分：%d\n",L1->elem[0].Score);
+        printf("去除一个最低分：%d\n",L1->elem[a].Score);
+        printf("最后%s同学得分为：%d\n",L2->elem[s].name,count(*L1));
     }
-    
 }
 
 int  main()
@@ -306,11 +349,11 @@ int  main()
             case 5:
                 find(l2,l1);//查找
                 break;
-            /*case 6:
-                sort(&l);//评分
-                display(l);
+            case 6:
+                grade(&l2, &l1);//评分
+                //display(l);
                 break;
-            case 7:
+            /*case 7:
                 save(&l);//读取
                 break;
             case 8:
