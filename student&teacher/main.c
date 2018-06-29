@@ -15,7 +15,7 @@
 struct Student
 {
     char name[10];
-    char sex;
+    char sex[3];
     char proname[10];
     char protype[10];
     int num;
@@ -33,7 +33,7 @@ typedef struct
 struct Teacher
 {
     char name[10];
-    char sex;
+    char sex[3];
     int num;
     int Score;
 };
@@ -72,6 +72,57 @@ char menu()
     return input;
 }
 
+bool Insert(SeqListT* L) //增加老师
+{
+    int Int;
+    printf("请输入要插入老师的相关信息：");
+    ElemTypeT X;
+    printf("请输入老师姓名：\n");
+    scanf("%s",X.name);
+    printf("请输入老师性别：\n");
+    scanf("%s",X.sex);
+    printf("输入老师的联系方式：\n");
+    scanf("%d",&X.num);
+    printf("请输入要插入的位置:\n");
+    scanf("%d",&Int);
+    int j;
+    if(L->lastT==MAXSIZE-1){
+        printf("线性表满！\n");
+        return false;
+    }
+    if(Int<1 || Int>L->lastT+2){
+        printf("位置不合法！\n");
+        return false;
+    }
+    for(j=L->lastT; j>=Int-1; j--)
+    {
+        L->elem[j+1]=L->elem[j];
+    }
+    L->elem[Int-1]=X;
+    L->lastT++;
+    return true;
+}
+bool delet(SeqListT* L) //删除老师信息
+{
+    int i,j;
+    printf("请选择要删除老师信息的位置:\n");
+    scanf("%d/n",&i);
+    if(L->lastT==-1){
+        printf("没有可以删除的老师信息！\n");
+        return false;
+    }
+    if(i<1 || i>L->lastT+2){
+        printf("位置不合法！\n");
+        return false;
+    }
+    for(j=i-1; j<L->lastT; j++)
+    {
+        L->elem[j]=L->elem[j+1];
+    }
+    L->lastT--;
+    printf("删除成功！\n");
+    return true;
+}
 
 void sortMax(SeqListT *L)
 {
@@ -91,6 +142,18 @@ void sortMax(SeqListT *L)
     }
 }
 
+int count(SeqListT L)
+{
+    int i,j=0,c=0;
+    int average;
+    for(i=1;i<=L.lastT-1;i++)
+    {
+        j=j+L.elem[i].Score;
+        c++;
+    }
+    average=j/c;
+    return average;
+}
 void readin(SeqListT *L)// 输入老师相关信息
 {
     int r;
@@ -118,7 +181,7 @@ void readin(SeqListT *L)// 输入老师相关信息
         scanf("%s",L->elem[i].name);
         //strcpy(L->elem[i].name,name1);
         printf("请输入老师的性别：\n");
-        scanf("%c",&L->elem[i].sex);
+        scanf("%s",L->elem[i].sex);
         printf("请输入老师的联系方式：\n");
         scanf("%d",&L->elem[i].num);
     }
@@ -137,7 +200,7 @@ bool   findNameT(SeqListT L) //按姓名查找老师int
     {
         printf("|  序号   |   姓名   |   性别  |   联系方式  |\n");
         printf("|--------|----------|--------|----———----|\n");
-        printf("|%-8d|%-8s|%-8c|%-10d|\n",i+1,L.elem[i].name,L.elem[i].sex,L.elem[i].num);
+        printf("|%-8d|%-8s|%-8s|%-10d|\n",i+1,L.elem[i].name,L.elem[i].sex,L.elem[i].num);
         return true;
     }
     else
@@ -157,7 +220,7 @@ bool  findNameS(SeqListS L) //查找学生int
     {
         printf("|   序号  |    姓名   |  性别  |   节目名称  |  节目类型  |   联系方式  |  班级   |\n");
         printf("|--------|----------|--------|----———----|----———----|----———----|--------|\n");
-        printf("|%-8d|%-8s|%-8c|%-10s|%-10s|%-10d|%-8s|\n",i+1,L.elem[i].name,L.elem[i].sex,L.elem[i].proname,L.elem[i].protype,L.elem[i].num,L.elem[i].class);
+        printf("|%-8d|%-8s|%-8s|%-10s|%-10s|%-10d|%-8s|\n",i+1,L.elem[i].name,L.elem[i].sex,L.elem[i].proname,L.elem[i].protype,L.elem[i].num,L.elem[i].class);
         return true;
     }
     else
@@ -168,20 +231,51 @@ bool  findNameS(SeqListS L) //查找学生int
 void find(SeqListT L1,SeqListS L2)
 {
     int a;
-    printf("查找学生还是教师（1.教师 2.学生）\n");
-    scanf("%d",&a);
-    if(a==1)
+    if(L1.lastT==-1)
+        printf("没有可以查询的老师信息!\n");
+    else
     {
-        findNameT(L1);
+        printf("查找学生还是教师（1.教师 2.学生）\n");
+        scanf("%d",&a);
+        if(a==1)
+        {
+            findNameT(L1);
+        }
+        else if(a==2)
+        {
+            findNameS(L2);
+        }
+        else if(a!=1&&a!=2)
+        {
+            printf("输入信息有问题！\n");
+        }
     }
-    else if(a==2)
+}
+
+void grade(SeqListT L1,SeqListS L2)//评分
+{
+    int s=0,t=0,j=1,a;
+    a=L1.lastT;
+    printf("开始评分\n");
+    for(s=0;s<=L2.lastS;s++)
     {
-        findNameS(L2);
+        printf("----------------------------\n");
+        printf("%d\n",s+1);
+        while(j)
+        {
+            for(t=0;t<=L1.lastT;t++)
+            {
+                printf("请输入%s老师给予的分数：",L1.elem[t].name);
+                scanf("%d",&L1.elem[t].Score);
+                printf("\n");
+            }
+            count(L1);
+            printf("去除一个最高分：%d\n",L1.elem[0].Score);
+            printf("去除一个最低分：%d\n",L1.elem[a].Score);
+            printf("最后%s同学得分：%d\n",L2.elem[s].name,count(L1));
+        }
     }
-    else if(a!=1&&a!=2)
-    {
-        printf("输入信息有问题！\n");
-    }
+    
 }
 
 int  main()
@@ -195,24 +289,24 @@ int  main()
         switch(menu())
         {
             case 1:
-                readin(&l);//输入
-                display(l);
+                readin(&l2);//输入
+                //display(l2);
                 break;
             case 2:
-                find(l);//增加
+                find(l2,l1);//增加
                 break;
             case 3:
-                Insert(&l);	//删除
-                display(l);
+                Insert(&l2);//删除
+                //display(l);
                 break;
             case 4:
-                delet(&l);//修改
-                display(l);
+                delet(&l2);//修改
+                //display(l);
                 break;
             case 5:
-                display(l);//查找
+                find(l2,l1);//查找
                 break;
-            case 6:
+            /*case 6:
                 sort(&l);//评分
                 display(l);
                 break;
@@ -221,7 +315,7 @@ int  main()
                 break;
             case 8:
                 load(&l);//保存
-                break;
+                break;*/
             case 9:
                 printf("-----–谢谢使用-----\n");
                 exit(1);
